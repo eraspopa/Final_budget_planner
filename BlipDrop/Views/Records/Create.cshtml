@@ -1,0 +1,83 @@
+﻿@model BlipDrop.ViewModels.RecordEditViewModel
+
+@{
+    ViewBag.Title = "Record";
+}
+<h2>Record</h2>
+
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+<div class="form-horizontal">
+    <h4>Create a new Record by entering the Record name, Subcategory, and Category.</h4>
+    <hr />
+    <div class="form-group">
+        @Html.LabelFor(x => Model.SelectedSubCategoryId, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-5">
+            @Html.DropDownListFor(x => Model.SelectedSubCategoryId, new SelectList(Model.Subcategories, "Value", "Text"), htmlAttributes: new { @class = "form-control", id = "Subcategory" })
+            @Html.ValidationMessageFor(x => x.SelectedSubCategoryId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => Model.SelectedCategoryCode, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-5">
+            @Html.DropDownListFor(x => Model.SelectedCategoryCode, new SelectList(Model.Categories, "Value", "Text"), htmlAttributes: new { @class = "form-control", @id = "Category" })
+            @Html.ValidationMessageFor(x => x.SelectedCategoryCode, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.AmountValue, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.AmountValue, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.AmountValue, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => Model.SelectedPeriodId, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-5">
+            @Html.DropDownListFor(x => Model.SelectedPeriodId, new SelectList(Model.Categories, "Value", "Text"), htmlAttributes: new { @class = "form-control", @id = "Category" })
+            @Html.ValidationMessageFor(x => x.SelectedPeriodId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+            $('#Subcategory').change(function () {
+                var selectedSubcategory = $("#Subcategory").val();
+                var CategoriesSelect = $('#Category');
+                CategoriesSelect.empty();
+                if (selectedSubcategory != null && selectedSubcategory != '') {
+                    $.getJSON('@Url.Action("GetCategories")', { SubcategoryId: selectedSubcategory }, function (Categories) {
+                        if (Categories != null && !jQuery.isEmptyObject(Categories))
+                        {
+                            CategoriesSelect.append($('<option/>', {
+                                value: null,
+                                text: ""
+                            }));
+                            $.each(Categories, function (index, Category) {
+                                CategoriesSelect.append($('<option/>', {
+                                    value: Category.Value,
+                                    text: Category.Text
+                                }));
+                            });
+                        };
+                    });
+                }
+            });
+    </script>
+}
